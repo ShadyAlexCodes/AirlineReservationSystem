@@ -71,7 +71,7 @@ public class AirlineController {
                     case 0 -> quit = true;
                     case 1 -> checkBalance(customer);
                     case 2 -> bookAFlight(customer);
-                    case 3 -> System.out.println("Check balance");
+                    case 3 -> cancelAFlight(customer, flights);
                     case 4 -> viewCustomerFlights(customer);
 
                 }

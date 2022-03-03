@@ -114,10 +114,12 @@ public class AirlineManagement {
         }
         if (!found) {
             boolean snacks = Console.getBoolean("Does this plane hand out snacks", "yes", "no");
+/*
             int classes = Console.getInteger("How many classes does this plane have", 1, 4, true);
+*/
             int seats = Console.getInteger("How many seats does this plane have", 12, 75, true);
 
-            planes.add(new Plane(planeType, snacks, classes, seats));
+            planes.add(new Plane(planeType, snacks, seats));
             System.out.println("The plane " + planeType + " has been added!");
         }
     }

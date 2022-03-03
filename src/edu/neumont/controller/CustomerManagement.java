@@ -4,8 +4,11 @@ import edu.neumont.model.Flights;
 import edu.neumont.model.Person;
 import edu.neumont.utils.Console;
 
+import java.util.ArrayList;
+
 import static edu.neumont.controller.AirlineController.customers;
 import static edu.neumont.controller.AirlineController.flights;
+import static edu.neumont.view.View.viewCustomerFlights;
 import static edu.neumont.view.View.viewFlights;
 
 public class CustomerManagement {
@@ -16,10 +19,9 @@ public class CustomerManagement {
     public static void createAccount() {
         String firstName = Console.getString("Enter your first name: ");
         String lastName = Console.getString("Enter your last name: ");
-        int userPin = Console.getInteger("Create a user pin", 6, true);
+        int userPin = Console.getInteger("Create a user pin", 4, true);
         int age = Console.getInteger("What is your age: ");
         boolean isMinor = age < 18;
-
 
         if (checkCustomerExistence(firstName, lastName, userPin) == null) {
             customer = new Person(firstName, lastName, 1000, age, isMinor, userPin);
@@ -28,26 +30,10 @@ public class CustomerManagement {
             return;
         }
 
-        System.out.println("The customer " + customer.getFullName() + " already exists in the system.");
+        System.out.println("The customer " + firstName + lastName + " already exists in the system.");
+        customer = null;
     }
 
-    public static Person loginToAccount() {
-        String firstName = Console.getString("Enter your first name: ");
-        String lastName = Console.getString("Enter your last name: ");
-        int userPin = Console.getInteger("Enter your user pin", 6, true);
-
-        if (checkCustomerExistence(firstName, lastName, userPin) != null) {
-            System.out.println("Welcome back " + customer.getFullName() + "!");
-            System.out.println("You are booked for the following flights:");
-            for (int i = 0; i < customer.getFlights().size(); i++) {
-                System.out.println(customer.getFlights().get(i).getAirline() + ": " + customer.getFlights().get(i).getName() + " (" + customer.getFlights().get(i).getDateDepart() + ")");
-            }
-            return customer;
-        } else {
-            System.out.println("We could not find an account with the name " + firstName + " " + lastName + "!");
-        }
-        return null;
-    }
 
     /* Customer Book a Flight */
     public static void bookAFlight(Person customer) {
@@ -65,6 +51,36 @@ public class CustomerManagement {
         flights.get(selection).addPassengers(customer);
     }
 
+    public static void cancelAFlight(Person customer, ArrayList<Flights> flights) {
+        viewCustomerFlights(customer);
+
+        int selection = Console.getInteger("Enter a flight selection: ", 0, customer.getFlights().size(), true);
+        customer.getFlights().remove(selection);
+        flights.get(selection).getPassengers().remove(customer);
+    }
+
+
+    public static void checkBalance(Person customer) {
+        System.out.println(customer.getBalance());
+    }
+
+    public static Person loginToAccount() {
+        String firstName = Console.getString("Enter your first name: ");
+        String lastName = Console.getString("Enter your last name: ");
+        int userPin = Console.getInteger("Enter your user pin", 4, true);
+
+        if (checkCustomerExistence(firstName, lastName, userPin) != null) {
+            System.out.println("Welcome back " + customer.getFullName() + "!");
+            System.out.println("You are booked for the following flights:");
+            for (int i = 0; i < customer.getFlights().size(); i++) {
+                System.out.println(customer.getFlights().get(i).getAirline() + ": " + customer.getFlights().get(i).getName() + " (" + customer.getFlights().get(i).getDateDepart() + ")");
+            }
+            return customer;
+        } else {
+            System.out.println("We could not find an account with the name " + firstName + " " + lastName + "!");
+        }
+        return null;
+    }
 
     private static Person checkCustomerExistence(String firstName, String lastName, int userPin) {
         int i = 0;
@@ -77,9 +93,7 @@ public class CustomerManagement {
         return null;
     }
 
-    public static void checkBalance(Person customer) {
-        System.out.println(customer.getBalance());
-    }
+
 
 
 }

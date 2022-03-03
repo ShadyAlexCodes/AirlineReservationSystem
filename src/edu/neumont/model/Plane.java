@@ -6,6 +6,11 @@ public class Plane extends Airport {
     private int classes;
     private int totalSeats;
 
+    public Plane(String name, boolean snacks, int totalSeats) {
+        super.name = name;
+        this.snacks = snacks;
+        this.totalSeats = totalSeats;
+    }
 
     public Plane(String name, boolean snacks, int classes, int totalSeats) {
         super.name = name;
