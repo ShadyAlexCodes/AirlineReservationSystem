@@ -54,12 +54,13 @@ public class Console {
         return i;
     }
 
-    public static int getInteger(String prompt, int min, int max) {
+    public static int getInteger(String prompt, int min, int max, boolean withOptions) {
         int i = 0;
 
         boolean valid = false;
         while (!valid) {
-            String string = getString(prompt);
+            String options = (withOptions) ? (" (" + min + " - " + (max - 1) + "): ") : "";
+            String string = getString(prompt + options);
             try {
                 i = Integer.parseInt(string);
                 valid = (i >= min && i <= max);
@@ -67,6 +68,30 @@ public class Console {
                     Console.setColor(RED_BACKGROUND);
 
                     System.out.println("Entered value is not between " + min + " and " + max + ".");
+                    Console.setColor(RESET);
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("You have entered an invalid number.");
+            }
+        }
+
+        return i;
+    }
+
+    public static int getInteger(String prompt, int length, boolean withOptions) {
+        int i = 0;
+
+        boolean valid = false;
+        while (!valid) {
+            String options = (withOptions) ? (" (" + length + " digits): ") : "";
+            String string = getString(prompt + options);
+            try {
+                valid = (string.length() == length);
+                i = Integer.parseInt(string);
+                if (!valid) {
+                    Console.setColor(RED_BACKGROUND);
+
+                    System.out.println("The entered value must have a length of " + length);
                     Console.setColor(RESET);
                 }
             } catch (NumberFormatException ex) {
@@ -131,7 +156,7 @@ public class Console {
 
     public static boolean getBoolean(String prompt, String trueString, String falseString) {
         while (true) {
-            String response = getString(prompt);
+            String response = getString(prompt + " (" + trueString + "/" + falseString + "): ");
 
             if (response.equalsIgnoreCase(trueString)) return true;
             if (response.equalsIgnoreCase(falseString)) return false;
@@ -140,13 +165,14 @@ public class Console {
 
     // Generates a console-based menu using the Strings in options as the menu items.
     // Reserves the number 0 for the "quit" option when withQuit is true.
-    public static int getMenuSelection(String[] options, boolean withQuit) {
+    public static int getMenuSelection(String menuTitle, String[] options, boolean withQuit) {
         int i = 0;
         boolean valid = false;
         int selection = 0;
 
         while (!valid) {
             i = 1;
+            System.out.println("     " + menuTitle);
             System.out.println("-----------------------------");
             if (withQuit) System.out.println("0: Exit");
             for (var option : options) {
@@ -157,10 +183,9 @@ public class Console {
 
 
             int min = (withQuit) ? 0 : 1;
-            selection = getInteger("Enter selection (" + min + " - " + i + "): ", min, i);
+            selection = getInteger("Enter selection (" + min + " - " + (i - 1) + "): ", min, i, false);
             valid = true;
         }
-        System.out.println(selection);
         return selection;
     }
 
