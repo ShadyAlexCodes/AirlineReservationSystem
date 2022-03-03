@@ -6,13 +6,11 @@ import edu.neumont.model.Person;
 import edu.neumont.model.Plane;
 import edu.neumont.utils.Console;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static edu.neumont.controller.AirlineManagement.*;
 import static edu.neumont.controller.CustomerManagement.*;
-import static edu.neumont.view.View.*;
+import static edu.neumont.view.View.viewCustomerFlights;
 
 public class AirlineController {
 
@@ -34,7 +32,7 @@ public class AirlineController {
         }
     }
 
-    private void airlineManagement() throws Exception{
+    private void airlineManagement() throws Exception {
         boolean quit = false;
 
         while (!quit) {
@@ -57,11 +55,7 @@ public class AirlineController {
             switch (selection) {
                 case 0 -> quit = true;
                 case 1 -> createAccount();
-                case 2 -> loginToAccount();
-                case 3 -> System.out.println("Check balance");
-                case 4 -> bookAFlight();
-                case 5 -> System.out.println("Cancel a flight");
-                case 6 -> viewCustomerFlights(customers, flights);
+                case 2 -> customerLogin();
 
             }
         }
@@ -69,18 +63,18 @@ public class AirlineController {
 
     private void customerLogin() {
         boolean quit = false;
-        loginToAccount();
-        while (!quit) {
-            int selection = Console.getMenuSelection("Customer Management", new String[]{"Check Balance", "Book a Flight", "Cancel a Flight", "View Flights"}, true);
-            switch (selection) {
-                case 0 -> quit = true;
-                case 1 -> createAccount();
-                case 2 ->
-                case 3 -> System.out.println("Check balance");
-                case 4 -> bookAFlight();
-                case 5 -> System.out.println("Cancel a flight");
-                case 6 -> viewCustomerFlights(customers, flights);
+        Person customer = loginToAccount();
+        if (customer != null) {
+            while (!quit) {
+                int selection = Console.getMenuSelection("Customer Management", new String[]{"Check Balance", "Book a Flight", "Cancel a Flight", "View Flights"}, true);
+                switch (selection) {
+                    case 0 -> quit = true;
+                    case 1 -> checkBalance(customer);
+                    case 2 -> bookAFlight(customer);
+                    case 3 -> System.out.println("Check balance");
+                    case 4 -> viewCustomerFlights(customer);
 
+                }
             }
         }
     }

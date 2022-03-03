@@ -14,7 +14,6 @@ public class Airline extends Airport {
         super.name = name;
     }
 
-
     public void setName(String name) {
         this.name = name;
     }

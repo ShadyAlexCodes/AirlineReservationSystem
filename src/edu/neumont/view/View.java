@@ -32,11 +32,11 @@ public class View {
         System.out.println("-----------------------");
     }
 
-
     public static void viewFlights(ArrayList<Flights> flights) {
+        int i = 0;
         System.out.println("\n        Flights\n-----------------------");
         for(var flight : flights) {
-            System.out.println(flight.getName() +
+            System.out.println(i + ": " + flight.getName() +
                     "  | Departing: " + flight.getLocationDepart() +
                     "  | Arriving: " + flight.getLocationArrive() +
                     "  | Plane Type: " + flight.getPlane().getName() +
@@ -49,18 +49,10 @@ public class View {
         System.out.println("-----------------------");
     }
 
-    public static void viewCustomerFlights(ArrayList<Person> person, ArrayList<Flights> flights) {
-        System.out.println("\n        Flights\n-----------------------");
-        for(var flight : flights) {
-            System.out.println(flight.getName() +
-                    "  | Departing: " + flight.getLocationDepart() +
-                    "  | Arriving: " + flight.getLocationArrive() +
-                    "  | Plane Type: " + flight.getPlane().getName() +
-                    "  | Airline: " + flight.getAirline().getName() +
-                    "  | Departing Date: " + flight.getDateDepart() +
-                    "  | Total Passengers: " + flight.getTotalSeats() +
-                    "  | Total Duration: " + flight.getDuration() +
-                    "\n  | Passengers: " + flight.getPassengers());
+    public static void viewCustomerFlights(Person customer) {
+        System.out.println("\n        Customer Flights\n-----------------------");
+        for (int i = 0; i < customer.getFlights().size(); i++) {
+            System.out.println(customer.getFlights().get(i).getName());
         }
         System.out.println("-----------------------");
     }
