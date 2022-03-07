@@ -1,23 +1,25 @@
 package edu.neumont.controller;
 
+import edu.neumont.database.MySQL;
 import edu.neumont.model.Airline;
 import edu.neumont.model.Flights;
 import edu.neumont.model.Plane;
 import edu.neumont.utils.Console;
+import edu.neumont.view.View;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static edu.neumont.controller.AirlineController.*;
 import static edu.neumont.view.View.*;
-import static edu.neumont.view.View.viewFlights;
 
 public class AirlineManagement {
 
-    static SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+    MySQL sql = new MySQL();
 
     /* Menus */
-    public static void manageAirline() {
+    public void manageAirline() {
         boolean quit = false;
 
         while (!quit) {
@@ -26,12 +28,12 @@ public class AirlineManagement {
                 case 0 -> quit = true;
                 case 1 -> createAirline();
                 case 2 -> removeAirline();
-                case 3 -> viewAirlines(airlines);
+                case 3 -> viewAirlines();
             }
         }
     }
 
-    public static void managePlanes() {
+    public void managePlanes() {
         boolean quit = false;
 
         while (!quit) {
@@ -40,12 +42,12 @@ public class AirlineManagement {
                 case 0 -> quit = true;
                 case 1 -> createPlane();
                 case 2 -> removePlane();
-                case 3 -> viewPlanes(planes);
+                case 3 -> viewPlanes();
             }
         }
     }
 
-    public static void manageFlights() throws Exception {
+    public void manageFlights() throws Exception {
         boolean quit = false;
 
         while (!quit) {
@@ -54,95 +56,53 @@ public class AirlineManagement {
                 case 0 -> quit = true;
                 case 1 -> createFlight();
                 case 2 -> removeFlight();
-                case 3 -> viewFlights(flights);
+                case 3 -> viewFlights();
             }
         }
     }
 
-    public static void manageCustomers() {
+    public void manageCustomers() {
         boolean quit = false;
 
         while (!quit) {
             int selection = Console.getMenuSelection("Plane Management", new String[]{"View Customers"}, true);
             switch (selection) {
                 case 0 -> quit = true;
-                case 1 -> viewCustomers(customers);
+                case 1 -> viewCustomers();
             }
         }
     }
 
     /* Airlines */
-    private static void createAirline() {
-        String airlineName = Console.getString("Enter an airline name: ").toLowerCase();
-        boolean found = false;
-        for (var airline : airlines) {
-            if (airlineName.equalsIgnoreCase(airline.getName())) {
-                found = true;
-                System.out.println("The airline " + airlineName + " already exists!");
-                break;
-            }
-        }
-        if (!found) {
-            airlines.add(new Airline(airlineName));
-            System.out.println("The airline " + airlineName + " has been added to the list.");
-        }
+    private void createAirline() {
+        String airlineName = Console.getString("Enter an airline name: ");
+        sql.addAirline(airlineName);
     }
 
-    private static void removeAirline() {
-        String airlineName = Console.getString("Enter an airline name: ").toLowerCase();
-        for (Airline airline : airlines) {
-            if (airline.compareType(airlineName)) {
-                airlines.remove(airline);
-                System.out.println("The airline " + airlineName + " has been removed from the list.");
-                break;
-            } else {
-                System.out.println("The airline " + airlineName + " was not found!");
-            }
-        }
+    private void removeAirline() {
+        viewAirlines();
+        int airline_id = Console.getInteger("Enter the airline ID: ");
+        sql.removeAirline(airline_id);
     }
+
 
     /* Planes */
-    private static void createPlane() {
-        String planeType = Console.getString("Enter a plane type: ").toLowerCase();
-        boolean found = false;
-        for (var plane : planes) {
-            if (planeType.equalsIgnoreCase(plane.getName())) {
-                found = true;
-                System.out.println("The plane " + planeType + " already exists!");
-                break;
-            }
-        }
-        if (!found) {
-            boolean snacks = Console.getBoolean("Does this plane hand out snacks", "yes", "no");
-/*
-            int classes = Console.getInteger("How many classes does this plane have", 1, 4, true);
-*/
-            int seats = Console.getInteger("How many seats does this plane have", 12, 75, true);
+    private void createPlane() {
+        String plane_name = Console.getString("Enter a plane name: ");
+        boolean snacks = Console.getBoolean("Does this plane hand out snacks", "yes", "no");
+        int total_seats = Console.getInteger("How many seats does this plane have", 12, 75, true);
+        sql.addPlane(plane_name, snacks, total_seats);
 
-            planes.add(new Plane(planeType, snacks, seats));
-            System.out.println("The plane " + planeType + " has been added!");
-        }
     }
 
-    private static void removePlane() {
-        String planeType = Console.getString("Enter a plane type: ").toLowerCase();
-        for (Plane plane : planes) {
-            if (plane.compareType(planeType)) {
-                planes.remove(plane);
-                System.out.println("The plane " + planeType + " has been removed from the list.");
-                break;
-            } else {
-                System.out.println("The plane " + planeType + " was not found!");
-            }
-        }
+    private void removePlane() {
+        viewPlanes();
+        int plane_id = Console.getInteger("Enter a plane id: ");
+        sql.removePlane(plane_id);
     }
 
     /* Flights */
-    private static void createFlight() throws Exception {
-        if (airlines.isEmpty() || planes.isEmpty()) {
-            System.out.println("There are no airlines or planes in the system! Please create an airline or a plane before adding any flights");
-            return;
-        }
+    private void createFlight() throws Exception {
 
         String flightName = Console.getString("Enter a flight name: ");
         String flightDeparting = Console.getString("Enter a departure location: ");
@@ -151,26 +111,19 @@ public class AirlineManagement {
         String dateString = Console.getDateString("Enter departure date (mm-dd-yyyy): ", dateFormat);
         Date date = dateFormat.parse(dateString);
         // display plane types
-        viewPlanes(planes);
-        int planeSelection = Console.getInteger("Enter a plane number: ", 0, planes.size(), true);
-        Plane plane = planes.get(planeSelection);
-
+        viewPlanes();
+        int planeSelection = Console.getInteger("Enter a plane number: ");
         // display airlines
-        viewAirlines(airlines);
-        int airlineSelection = Console.getInteger("Enter a airline number: ", 0, airlines.size(), true);
-        Airline airline = airlines.get(airlineSelection);
-
-        Flights newFlight = new Flights(flightName, flightDeparting, flightArriving, plane, airline, date, plane.getTotalSeats(), plane.getTotalSeats() * 5, flightDuration);
-
-        flights.add(newFlight);
-        airline.addFlights(newFlight);
+        viewAirlines();
+        int airlineSelection = Console.getInteger("Enter a airline number: ");
+         sql.addFlight(flightName, flightDeparting, flightArriving, flightDuration, 100, 0, planeSelection, airlineSelection);
         System.out.println("The flight " + flightName + " has been added!");
     }
 
-    private static void removeFlight() {
-        viewFlights(flights);
-        String flightName = Console.getString("Enter flight name: ").toLowerCase();
-        for (Flights flight : flights) {
+    private void removeFlight() {
+        viewFlights();
+        String flightName = Console.getString("Enter flight name: ");
+     /*   for (Flights flight : flights) {
             if (flight.compareType(flightName)) {
                 flights.remove(flight);
                 System.out.println("The plane " + flightName + " has been removed from the list.");
@@ -178,7 +131,7 @@ public class AirlineManagement {
             } else {
                 System.out.println("The plane " + flightName + " was not found!");
             }
-        }
+        }*/
     }
 
 }

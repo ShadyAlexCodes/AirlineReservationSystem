@@ -1,22 +1,22 @@
 package edu.neumont.controller;
 
+import edu.neumont.database.MySQL;
 import edu.neumont.model.Flights;
 import edu.neumont.model.Person;
 import edu.neumont.utils.Console;
 
 import java.util.ArrayList;
 
-import static edu.neumont.controller.AirlineController.customers;
-import static edu.neumont.controller.AirlineController.flights;
 import static edu.neumont.view.View.viewCustomerFlights;
 import static edu.neumont.view.View.viewFlights;
 
 public class CustomerManagement {
 
-    static Person customer = null;
+    public static Person customer = null;
+    static MySQL sql = new MySQL();
 
     /* Customer */
-    public static void createAccount() {
+    public void createAccount() {
         String firstName = Console.getString("Enter your first name: ");
         String lastName = Console.getString("Enter your last name: ");
         int userPin = Console.getInteger("Create a user pin", 4, true);
@@ -25,7 +25,8 @@ public class CustomerManagement {
 
         if (checkCustomerExistence(firstName, lastName, userPin) == null) {
             customer = new Person(firstName, lastName, 1000, age, isMinor, userPin);
-            customers.add(customer);
+            sql.addUser(firstName, lastName, isMinor, age, 1000, userPin);
+           // customers.add(customer);
             System.out.println("The customer " + customer.getFullName() + " has been created!");
             return;
         }
@@ -36,22 +37,19 @@ public class CustomerManagement {
 
 
     /* Customer Book a Flight */
-    public static void bookAFlight(Person customer) {
-        if (flights.isEmpty() || customers.isEmpty()) {
-            System.out.println("We cannot book a flight because one of the following are missing: Flights, or Customers. Please create an flight or customers before booking a flight.");
-            return;
-        }
+    public void bookAFlight(Person customer) {
+
 
         System.out.println("Welcome back " + customer.getFullName());
 
-        viewFlights(flights);
-        int selection = Console.getInteger("Select a flight: ", 0, flights.size(), true);
-
+        viewFlights();
+        //int selection = Console.getInteger("Select a flight: ", 0, flights.size(), true);
+/*
         customer.addFlights(flights.get(selection));
-        flights.get(selection).addPassengers(customer);
+        flights.get(selection).addPassengers(customer);*/
     }
 
-    public static void cancelAFlight(Person customer, ArrayList<Flights> flights) {
+    public void cancelAFlight(Person customer, ArrayList<Flights> flights) {
         viewCustomerFlights(customer);
 
         int selection = Console.getInteger("Enter a flight selection: ", 0, customer.getFlights().size(), true);
@@ -60,11 +58,11 @@ public class CustomerManagement {
     }
 
 
-    public static void checkBalance(Person customer) {
+    public void checkBalance(Person customer) {
         System.out.println(customer.getBalance());
     }
 
-    public static Person loginToAccount() {
+    public Person loginToAccount() {
         String firstName = Console.getString("Enter your first name: ");
         String lastName = Console.getString("Enter your last name: ");
         int userPin = Console.getInteger("Enter your user pin", 4, true);
@@ -82,18 +80,9 @@ public class CustomerManagement {
         return null;
     }
 
-    private static Person checkCustomerExistence(String firstName, String lastName, int userPin) {
+    private Person checkCustomerExistence(String firstName, String lastName, int userPin) {
         int i = 0;
-        for (var customer : customers) {
-            if (firstName.equalsIgnoreCase(customer.getFirstName()) && lastName.equalsIgnoreCase(customer.getLastName()) && userPin == customer.getUserPin()) {
-                return customer = customers.get(i);
-            }
-            i++;
-        }
-        return null;
+
+        return customer = sql.checkUserExistence(firstName, lastName, userPin);
     }
-
-
-
-
 }

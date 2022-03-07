@@ -7,17 +7,17 @@ import edu.neumont.model.Plane;
 import edu.neumont.utils.Console;
 
 import java.util.ArrayList;
-
-import static edu.neumont.controller.AirlineManagement.*;
-import static edu.neumont.controller.CustomerManagement.*;
 import static edu.neumont.view.View.viewCustomerFlights;
 
 public class AirlineController {
 
-    public static final ArrayList<Airline> airlines = new ArrayList<>();
-    public static final ArrayList<Flights> flights = new ArrayList<>();
-    public static final ArrayList<Plane> planes = new ArrayList<>();
-    public static final ArrayList<Person> customers = new ArrayList<>();
+    protected ArrayList<Airline> airlines = new ArrayList<>();
+    protected ArrayList<Flights> flights = new ArrayList<>();
+    protected ArrayList<Plane> planes = new ArrayList<>();
+    protected ArrayList<Person> customers = new ArrayList<>();
+
+    CustomerManagement customerManagement = new CustomerManagement();
+    AirlineManagement airlineManagement = new AirlineManagement();
 
     public void run() throws Exception {
         boolean quit = false;
@@ -39,10 +39,10 @@ public class AirlineController {
             int selection = Console.getMenuSelection("Airline Management", new String[]{"Manage Airlines", "Manage Planes", "Manage Flights", "Manage Customers"}, true);
             switch (selection) {
                 case 0 -> quit = true;
-                case 1 -> manageAirline();
-                case 2 -> managePlanes();
-                case 3 -> manageFlights();
-                case 4 -> manageCustomers();
+                case 1 -> airlineManagement.manageAirline();
+                case 2 -> airlineManagement.managePlanes();
+                case 3 -> airlineManagement.manageFlights();
+                case 4 -> airlineManagement.manageCustomers();
             }
         }
     }
@@ -54,7 +54,7 @@ public class AirlineController {
             int selection = Console.getMenuSelection("Customer Management", new String[]{"Create Account", "Login to Account"}, true);
             switch (selection) {
                 case 0 -> quit = true;
-                case 1 -> createAccount();
+                case 1 -> customerManagement.createAccount();
                 case 2 -> customerLogin();
 
             }
@@ -63,15 +63,15 @@ public class AirlineController {
 
     private void customerLogin() {
         boolean quit = false;
-        Person customer = loginToAccount();
+        Person customer = customerManagement.loginToAccount();
         if (customer != null) {
             while (!quit) {
                 int selection = Console.getMenuSelection("Customer Management", new String[]{"Check Balance", "Book a Flight", "Cancel a Flight", "View Flights"}, true);
                 switch (selection) {
                     case 0 -> quit = true;
-                    case 1 -> checkBalance(customer);
-                    case 2 -> bookAFlight(customer);
-                    case 3 -> cancelAFlight(customer, flights);
+                    case 1 -> customerManagement.checkBalance(customer);
+                    case 2 -> customerManagement.bookAFlight(customer);
+                    //case 3 -> customerManagement.cancelAFlight(customer);
                     case 4 -> viewCustomerFlights(customer);
 
                 }
